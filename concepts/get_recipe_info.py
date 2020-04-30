@@ -18,11 +18,8 @@ title = soup.find(class_="recipe-title").get_text().replace('\n', '').strip(' ')
 #print(title)
 
 
-# find recipe steps
-recipe_steps = soup.find(class_="recipe-steps")
-
 # parses recipe steps to get just the text from list items and puts the instructions in a list
-steps = [item.get_text().strip(' ')  for item in recipe_steps.find_all('li')]
+instructions = [item.get_text().strip(' ')  for item in soup.find(class_="recipe-steps").find_all('li')]
 
 # for step in steps:
 #     print(step)
@@ -36,17 +33,40 @@ ingredients_list = soup.find('ul', class_="recipe-ingredients").find_all('li')
 ingredients = []
 for item in ingredients_list:
     quantity = item.find(class_="quantity").get_text().replace('\n', '').strip(' ')
-    ingredient = item.find(class_="ingredient-name").get_text().replace('\n', '').strip(' ')
+    ingredient = item.find(class_="ingredient-name").get_text().replace('\n', '').strip(' ').split(',')
+    ingredient_name = ingredient[0]
+    ingredient_details = ingredient[1:] if len(ingredient) > 1 else ''
 
-    ingredients.append((quantity, ingredient))
+
+    ingredients.append([[quantity], [ingredient_name], [ingredient_details]])
 
 # for ingredient in ingredients:
 #     print(ingredient[0], ingredient[1])
 
+# get recipe tags
+tags = [item.get_text().strip(' ') for item in soup.find(class_='tags-nutrition-container').find_all('a')]
+#print(tags)
+
 my_recipe = {
     "title": title,
     "ingredients": ingredients,
-    "instructions": steps
+    "instructions": instructions,
+    "tags": tags
 }
 
 print(my_recipe)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
