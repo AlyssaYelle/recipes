@@ -1,10 +1,13 @@
+'''
+playing around with beautiful soup to get web recipe info into a nice format for storing in db
+'''
+
+
 import requests
 from bs4 import BeautifulSoup
 
 # set url
-#url = "https://cooking.nytimes.com/recipes/1019944-vegan-broccoli-soup-with-cashew-cream"
-url = 'https://cooking.nytimes.com/recipes/1017310-butter-stewed-radishes'
-
+url = "https://cooking.nytimes.com/recipes/1017582-zucchini-flan"
 
 # get page data
 page = requests.get(url)
@@ -13,48 +16,64 @@ page = requests.get(url)
 soup = BeautifulSoup(page.content, 'html.parser')
 
 
+
+
 # find the recipe title
 title = soup.find(class_="recipe-title").get_text().replace('\n', '').strip(' ')
-#print(title)
 
+print('\ntitle:\n')
+print(title)
 
-# parses recipe steps to get just the text from list items and puts the instructions in a list
-instructions = [item.get_text().strip(' ')  for item in soup.find(class_="recipe-steps").find_all('li')]
-
-# for step in steps:
-#     print(step)
 
 
 # find list items for ingredients list
 ingredients_list = soup.find('ul', class_="recipe-ingredients").find_all('li')
 
-#print(ingredients_list)
-
+# load each ingredient into list
 ingredients = []
+
 for item in ingredients_list:
+    # separate out quantity, ingredient name, ingredient details
     quantity = item.find(class_="quantity").get_text().replace('\n', '').strip(' ')
     ingredient = item.find(class_="ingredient-name").get_text().replace('\n', '').strip(' ').split(',')
     ingredient_name = ingredient[0]
-    ingredient_details = ingredient[1:] if len(ingredient) > 1 else ''
+    ingredient_details = ''.join(ingredient[1:]) if len(ingredient) > 1 else ''
 
 
-    ingredients.append([[quantity], [ingredient_name], [ingredient_details]])
+    ingredients.append([quantity, ingredient_name, ingredient_details])
 
-# for ingredient in ingredients:
-#     print(ingredient[0], ingredient[1])
+print('\ningredients:\n')
+print(ingredients)
+
+
+
+# parses recipe steps to get just the text from list items and puts the instructions in a list
+instructions = [item.get_text().strip(' ')  for item in soup.find(class_="recipe-steps").find_all('li')]
+
+print('\ninstructions:\n')
+print(instructions)
+
 
 # get recipe tags
-tags = [item.get_text().strip(' ') for item in soup.find(class_='tags-nutrition-container').find_all('a')]
-#print(tags)
+tags = [item.get_text().strip(' ') for item in soup.find(class_='tags-nutrition-container').find_all('a')] if soup.find(class_='tags-nutrition-container') is not None else []
 
-my_recipe = {
+
+
+
+print('\ntags:\n')
+print(tags)
+
+# return full info as dictionary
+full_recipe_info = {
     "title": title,
     "ingredients": ingredients,
     "instructions": instructions,
     "tags": tags
 }
 
-print(my_recipe)
+print(full_recipe_info['title'])
+
+
 
 
 
