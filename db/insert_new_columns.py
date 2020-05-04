@@ -41,13 +41,13 @@ def insert_columns(cur, conn, table_name):
     inserts new columns into db
     title text
     tags text[] 
-    instructions text[]
+    instructions text
     ingredients text[][]
     '''
 
     cur.execute('ALTER TABLE %s ADD COLUMN %s text' % (table_name, 'title'))
     cur.execute('ALTER TABLE %s ADD COLUMN %s text[]' % (table_name, 'tags'))
-    cur.execute('ALTER TABLE %s ADD COLUMN %s text[]' % (table_name, 'instructions'))
+    cur.execute('ALTER TABLE %s ADD COLUMN %s text' % (table_name, 'instructions'))
     cur.execute('ALTER TABLE %s ADD COLUMN %s text[][]' % (table_name, 'ingredients'))
 
     conn.commit()

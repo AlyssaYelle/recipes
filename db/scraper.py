@@ -50,12 +50,16 @@ def scrape_title(soup):
 def scrape_ingredients(soup):
 
     # find list items for ingredients list
-    ingredients_list = soup.find('ul', class_="recipe-ingredients").find_all('li')
+    ingredients_list = soup.find(class_="recipe-ingredients-wrap").find_all('li')
 
 
     # load each ingredient into list
     ingredients = []
     for item in ingredients_list:
+
+        # handles the edge case where ingredients_list finds some extra elements such as nutrition info
+        if not item.find('span', class_="quantity"):
+            break
 
         # separate out quantity, ingredient name, ingredient details
         quantity = item.find(class_="quantity").get_text().replace('\n', '').strip(' ')
@@ -72,7 +76,7 @@ def scrape_ingredients(soup):
 def scrape_instructions(soup):
 
     # parses recipe steps to get just the text from list items and puts the instructions in a list
-    instructions = [item.get_text().strip(' ')  for item in soup.find(class_="recipe-steps").find_all('li')]
+    instructions = '\n'.join([item.get_text().strip(' ')  for item in soup.find(class_="recipe-steps").find_all('li')])
 
     return instructions
 
