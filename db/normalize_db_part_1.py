@@ -34,15 +34,10 @@ def connect():
         print('Connecting to the PostgreSQL database...')
         conn = psycopg2.connect(**params)
         
-        # create a cursor
-        #cur = conn.cursor()
-        
-        # urls = query_for_urls(conn)
+        #create_table_as_select(conn)
+        create_tags_recipes_table(conn)
+        create_tags_table(conn)
 
-        # update_table(conn, urls)
-       
-        # close the communication with the PostgreSQL
-        #cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     finally:
@@ -51,10 +46,53 @@ def connect():
             print('Database connection closed.')
 
 
+def create_tags_table(conn):
+    '''
+    creates new table to list tags
+    '''
+    cur = conn.cursor()
 
+    cur.execute("""CREATE TABLE tags(
+        id integer PRIMARY KEY,
+        tag_name text
+    )
+    """)
+    conn.commit()
+
+    cur.close()
+
+
+def create_tags_recipes_table(conn):
+    '''
+    creates new table for tags_recipes joining
+    '''
+    cur = conn.cursor()
+
+    cur.execute("""CREATE TABLE tags_recipes(
+        tag_id integer,
+        recipe_id integer,
+        PRIMARY KEY (tag_id, recipe_id)
+    )
+    """)
+    conn.commit()
+
+    cur.close()
+
+
+def create_table_as_select(conn):
+    '''
+    creates new table from recipes_list without unneccesary data
+    '''
+    cur = conn.cursor()
+
+    cur.execute("""CREATE TABLE recipes AS
+        SELECT title, ingredients, instructions, tags
+        FROM recipe_list""")
 
 
 
 
 if __name__ == '__main__':
+
+
     connect()
